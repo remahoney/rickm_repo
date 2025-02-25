@@ -47,6 +47,7 @@ pipeline {
       }
     }
   }
+<<<<<<< HEAD
 }
 post {
   success {
@@ -68,4 +69,6 @@ post {
       reportName: "jacoco checkstyle"
     ]
   )
+=======
+>>>>>>> 528187db491972c6df341cf9773ceae8b837e19b
 }
