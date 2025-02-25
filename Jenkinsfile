@@ -1,7 +1,5 @@
 pipeline {
-  agent {
-    label 'docker-agent'
-  }
+  agent any
   stages {
     stage('Checkout code and prepare environment') {
       steps {
@@ -12,7 +10,7 @@ pipeline {
         """
       }
     }
-    stage('Run tests and generate reports') {
+    stage("Run initial test and jacoco tests") {
       steps {
         sh """
           cd Chapter08/sample1
@@ -20,48 +18,54 @@ pipeline {
           ./gradlew jacocoTestReport
           ./gradlew jacocoTestCoverageVerification
         """
-        publishHTML (
-          target: [
-            reportDir: 'Chapter08/sample1/build/reports/tests/test',
-            reportFiles: 'index.html',
-            reportName: "JaCoCo Report"
-          ]
-        )
       }
     }
-    stage("Run and generate report named jacoco checkstyle") {
+    stage("Run checkstyleTest, codecoverage, and checkstyle tests") {
       steps {
         sh """
           cd Chapter08/sample1
           ./gradlew checkstyleTest
+          #./gradlew CodeCoverage
+          #./gradlew checkstyle
         """
-        publishHTML (
-          target: [
-            reportDir: 'Chapter08/sample1/build/reports/tests/test',
-            reportFiles: 'index.html',
-            reportName: "jacoco checkstyle"
-          ]
-        )
+      }
+    }
+    stage("Perform Conditional Tests if a Failure") {
+      when {
+        expression { currentBuild.result == 'FAILURE' }
+      }
+      steps {
+        echo 'currentBuild failed'
+      }
+    }
+    stage("Perform Conditional Tests if a Success") {
+      when {
+        expression { currentBuild.result == 'SUCCESS' }
+      }
+      steps {
+        echo 'currentBuild succeeded'
       }
     }
   }
-}pipeline {
-
-    agent { label 'docker-agent' }
-
-    stages {
-
-        stage("Hello") {
-
-            steps {
-
-                    sleep 300 
-
-                    echo 'Hello World from UML'
-            }
-
-        }
-
-    }
-
+}
+post {
+  success {
+    echo 'pipeline ran perfectly'
+  }
+  failure {
+    echo 'pipeline failure'
+  }
+  publishHTML (
+    target [
+      reportDir: 'Chapter08/sample1/build/reports/tests/test',
+      reportFiles: 'index.html'
+      reportName: "JaCoCo Report'
+    ]
+  publishHTML (
+    target: [
+      reportDir: 'Chapter08/sample1/build/reports/tests/test',
+      reportFiles: 'index.html',
+      reportName: "jacoco checkstyle"
+    ]
+  )
 }
