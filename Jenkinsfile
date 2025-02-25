@@ -58,8 +58,8 @@ post {
   publishHTML (
     target [
       reportDir: 'Chapter08/sample1/build/reports/tests/test',
-      reportFiles: 'index.html'
-      reportName: "JaCoCo Report'
+      reportFiles: 'index.html',
+      reportName: "JaCoCo Report"
     ]
   publishHTML (
     target: [
