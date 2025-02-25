@@ -18,6 +18,12 @@ pipeline {
           ./gradlew jacocoTestReport
           ./gradlew jacocoTestCoverageVerification
         """
+        publishHTML (
+          target [
+            reportDir: 'Chapter08/sample1/build/reports/tests/test',
+            reportFiles: 'index.html'
+            reportName: "JaCoCo Report'
+          ]
       }
     }
     stage("Run checkstyleTest, codecoverage, and checkstyle tests") {
@@ -28,6 +34,13 @@ pipeline {
           #./gradlew CodeCoverage
           #./gradlew checkstyle
         """
+        publishHTML (
+          target: [
+            reportDir: 'Chapter08/sample1/build/reports/tests/test',
+            reportFiles: 'index.html',
+            reportName: "jacoco checkstyle"
+          ]
+        )
       }
     }
     stage("Perform Conditional Tests if a Failure") {
@@ -55,18 +68,4 @@ post {
   failure {
     echo 'pipeline failure'
   }
-  publishHTML (
-    target [
-      reportDir: 'Chapter08/sample1/build/reports/tests/test',
-      reportFiles: 'index.html',
-      reportName: "JaCoCo Report"
-    ]
-  )
-  publishHTML (
-    target: [
-      reportDir: 'Chapter08/sample1/build/reports/tests/test',
-      reportFiles: 'index.html',
-      reportName: "jacoco checkstyle"
-    ]
-  )
 }
