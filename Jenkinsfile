@@ -24,6 +24,7 @@ pipeline {
             reportFiles: 'index.html'
             reportName: "JaCoCo Report"
           ]
+        )
       }
     }
     stage("Run checkstyleTest, codecoverage, and checkstyle tests") {
