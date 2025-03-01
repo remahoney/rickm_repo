@@ -56,5 +56,12 @@ pipeline {
       failure {
         echo 'pipeline failure'
       } 
+      publishHTML (
+        target: [
+          reportDir: 'Chapter08/sample1/build/reports/tests/test',
+          reportFiles: 'index.html',
+          reportName: "JaCoCo and JaCoCo checkstyle Report"
+        ]
+      ) 
   }
 }
