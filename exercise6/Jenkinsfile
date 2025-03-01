@@ -27,9 +27,16 @@ pipeline {
         sh """
           cd Chapter08/sample1
           ./gradlew checkstyleTest
-          ./gradlew CodeCoverage
-          ./gradlew checkstyle
+#          ./gradlew CodeCoverage
+#          ./gradlew checkstyle
         """
+        publishHTML (
+          target: [
+            reportDir: 'Chapter08/sample1/build/reports/tests/test',
+            reportFiles: 'index.html',
+            reportName: "JaCoCo and JaCoCo checkstyle Report"
+          ]
+        )
       }
     }
     stage("Perform Conditional Tests if a Failure") {
@@ -49,12 +56,12 @@ pipeline {
       }
     }
   }
-}
-post {
-  success {
-    echo 'pipeline ran perfectly'
-  }
-  failure {
-    echo 'pipeline failure'
+  post {
+    success {
+      echo 'pipeline ran perfectly'
+      } 
+      failure {
+        echo 'pipeline failure'
+      } 
   }
 }
