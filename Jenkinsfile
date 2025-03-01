@@ -53,8 +53,8 @@ pipeline {
 post {
   success {
     echo 'pipeline ran perfectly'
-  }
-  failure {
-    echo 'pipeline failure'
-  }
+    } 
+    failure {
+      echo 'pipeline failure'
+    } 
 }
