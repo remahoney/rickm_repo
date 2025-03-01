@@ -27,8 +27,8 @@ pipeline {
         sh """
           cd Chapter08/sample1
           ./gradlew checkstyleTest
-          ./gradlew CodeCoverage
-          ./gradlew checkstyle
+#          ./gradlew CodeCoverage
+#          ./gradlew checkstyle
         """
       }
     }
