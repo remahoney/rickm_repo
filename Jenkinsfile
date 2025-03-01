@@ -1,5 +1,7 @@
 pipeline {
-  agent any
+  agent {
+    label 'docker-agent'
+    }
   stages {
     stage('Checkout code and prepare environment') {
       steps {
@@ -17,14 +19,7 @@ pipeline {
           ./gradlew test
           ./gradlew jacocoTestReport
           ./gradlew jacocoTestCoverageVerification
-        """
-        publishHTML (
-          target [
-            reportDir: 'Chapter08/sample1/build/reports/tests/test',
-            reportFiles: 'index.html'
-            reportName: "JaCoCo Report'
-          ]
-        )
+        """    
       }
     }
     stage("Run checkstyleTest, codecoverage, and checkstyle tests") {
@@ -35,13 +30,6 @@ pipeline {
           ./gradlew CodeCoverage
           ./gradlew checkstyle
         """
-        publishHTML (
-          target: [
-            reportDir: 'Chapter08/sample1/build/reports/tests/test',
-            reportFiles: 'index.html',
-            reportName: "jacoco checkstyle"
-          ]
-        )
       }
     }
     stage("Perform Conditional Tests if a Failure") {
