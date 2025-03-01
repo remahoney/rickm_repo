@@ -49,12 +49,12 @@ pipeline {
       }
     }
   }
-}
-post {
-  success {
-    echo 'pipeline ran perfectly'
-    } 
-    failure {
-      echo 'pipeline failure'
-    } 
+  post {
+    success {
+      echo 'pipeline ran perfectly'
+      } 
+      failure {
+        echo 'pipeline failure'
+      } 
+  }
 }
