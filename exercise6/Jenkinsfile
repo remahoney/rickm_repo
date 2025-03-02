@@ -1,67 +1,55 @@
 pipeline {
-  agent {
-    label 'docker-agent'
+    agent {
+      label 'docker-agent'
     }
-  stages {
-    stage('Checkout code and prepare environment') {
-      steps {
-        git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
-        sh """
-          cd Chapter08/sample1
-          chmod +x gradlew
-        """
-      }
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'main') {
+                        echo 'Running build on main branch'
+                    } else if (env.BRANCH_NAME.contains('feature')) {
+                        echo 'Running build on feature branch'
+                    } else if (env.BRANCH_NAME.contains('test')) {
+                        echo 'Running build on test branch'
+                    }
+                      else {
+                        error('Branch not allowed to run this pipeline')
+                    }
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME.contains('feature') || env.BRANCH_NAME.contains('test')) {
+                        echo 'Running tests'
+                        // Add your test steps here
+                    } else {
+                        error('Branch not allowed to run this pipeline')
+                    }
+                }
+            }
+        }
+        stage('CodeCoverage') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'main') {
+                        echo 'Running code coverage on main branch'
+                        // Add your code coverage steps here
+                    } else {
+                        echo 'Skipping code coverage'
+                    }
+                }
+            }
+        }
     }
-    stage("Run initial test and jacoco tests") {
-      steps {
-        sh """
-          cd Chapter08/sample1
-          ./gradlew test
-          ./gradlew jacocoTestReport
-          ./gradlew jacocoTestCoverageVerification
-        """    
-      }
-    }
-    stage("Run checkstyleTest, codecoverage, and checkstyle tests") {
-      steps {
-        sh """
-          cd Chapter08/sample1
-          ./gradlew checkstyleTest
-#          ./gradlew CodeCoverage
-#          ./gradlew checkstyle
-        """
-        publishHTML (
-          target: [
-            reportDir: 'Chapter08/sample1/build/reports/tests/test',
-            reportFiles: 'index.html',
-            reportName: "JaCoCo and JaCoCo checkstyle Report"
-          ]
-        )
-      }
-    }
-    stage("Perform Conditional Tests if a Failure") {
-      when {
-        expression { currentBuild.result == 'FAILURE' }
-      }
-      steps {
-        echo 'currentBuild failed'
-      }
-    }
-    stage("Perform Conditional Tests if a Success") {
-      when {
-        expression { currentBuild.result == 'SUCCESS' }
-      }
-      steps {
-        echo 'currentBuild succeeded'
-      }
-    }
-  }
-  post {
-    success {
-      echo 'pipeline ran perfectly'
-      } 
+    post {
+      success {
+        echo 'pipeline ran perfectly'
+        } 
       failure {
         echo 'pipeline failure'
-      } 
-  }
+        }
+    }
 }
