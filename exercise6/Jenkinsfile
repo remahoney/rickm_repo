@@ -10,7 +10,10 @@ pipeline {
                         echo 'Running build on main branch'
                     } else if (env.BRANCH_NAME.contains('feature')) {
                         echo 'Running build on feature branch'
-                    } else {
+                    } else if (env.BRANCH_NAME.contains('test')) {
+                        echo 'Running build on test branch'
+                    }
+                      else {
                         error('Branch not allowed to run this pipeline')
                     }
                 }
@@ -19,7 +22,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME.contains('feature')) {
+                    if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME.contains('feature') || env.BRANCH_NAME.contains('test')) {
                         echo 'Running tests'
                         // Add your test steps here
                     } else {
