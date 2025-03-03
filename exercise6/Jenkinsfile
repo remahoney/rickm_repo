@@ -60,8 +60,9 @@ pipeline {
             }
           }
         }
+      }
       stage ('Publish Reports') {
-steps {
+        steps {
           publishHTML (
             target: [
               reportDir: 'Chapter08/sample1/build/reports/tests/test',
