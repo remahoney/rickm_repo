@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
-                        echo 'Running code coverage on main branch'
+                        echo 'Running CodeCoverage on main branch'
                     } else {
                         echo 'Skipping code coverage'
                     }
