@@ -38,10 +38,8 @@ pipeline {
                           ./gradlew jacocoTestReport
                           ./gradlew jacocoTestCoverageVerification
                          """
-                      }
                     } else {
                         error('Branch not allowed to run this pipeline')
-                    }
                 }
             }
         }
@@ -56,7 +54,6 @@ pipeline {
 //                        ./gradlew CodeCoverage
 //                        ./gradlew checkstyle
                          """
-                      }
                     } else {
                         echo 'Skipping code coverage'
                     }
