@@ -3,44 +3,75 @@ pipeline {
       label 'docker-agent'
     }
     stages {
-        stage('Build') {
-            steps {
-                script {
-                    if (env.BRANCH_NAME == 'main') {
-                        echo 'Running build on main branch'
-                    } else if (env.BRANCH_NAME.contains('feature')) {
-                        echo 'Running build on feature branch'
-                    } else if (env.BRANCH_NAME.contains('test')) {
-                        echo 'Running build on test branch'
-                    }
-                      else {
-                        error('Branch not allowed to run this pipeline')
-                    }
-                }
-            }
+      stage('Checkout code and prepare environment') {
+        steps {
+          git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
+          sh """
+            cd Chapter08/sample1
+            chmod +x gradlew
+          """
         }
-        stage('Test') {
-            steps {
-                script {
-                    if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME.contains('feature') || env.BRANCH_NAME.contains('test')) {
-                        echo 'Running tests'
-                    } else {
-                        error('Branch not allowed to run this pipeline')
-                    }
-                }
+      }
+      stage('Build') {
+        steps {
+          script {
+            if (env.BRANCH_NAME == 'main') {
+              echo 'Running build on main branch'
+            } else if (env.BRANCH_NAME.contains('feature')) {
+                echo 'Running build on feature branch'
+            } else if (env.BRANCH_NAME.contains('test')) {
+                echo 'Running build on test branch'
+            } else {
+                error('Branch not allowed to run this pipeline')
             }
+          }
         }
-        stage('CodeCoverage') {
-            steps {
-                script {
-                    if (env.BRANCH_NAME == 'main') {
-                        echo 'Running CodeCoverage on main branch'
-                    } else {
-                        echo 'Skipping code coverage'
-                    }
-                }
+      }
+      stage('Gradlew test nd jacoco Tests') {
+        steps {
+          script {
+            if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME.contains('feature') || env.BRANCH_NAME.contains('test')) {
+               echo 'Running tests'
+                 steps {
+                   sh """
+                     cd Chapter08/sample1
+                     ./gradlew test
+                     ./gradlew jacocoTestReport
+                     ./gradlew jacocoTestCoverageVerification
+                   """    
+                 }
+            } else {
+                error('Branch not allowed to run this pipeline')
             }
+          }
         }
+      }
+      stage('CodeCoverage') {
+        steps {
+          script {
+            if (env.BRANCH_NAME == 'main') {
+              echo 'Running CodeCoverage on main branch'
+              steps {
+                sh """
+                  cd Chapter08/sample1
+                 ./gradlew checkstyleTest
+                 ./gradlew CodeCoverage
+                 ./gradlew checkstyle
+                """
+                publishHTML (
+                  target: [
+                    reportDir: 'Chapter08/sample1/build/reports/tests/test',
+                    reportFiles: 'index.html',
+                    reportName: "JaCoCo and JaCoCo checkstyle Report"
+                  ]
+                )
+              }
+            } else {
+                echo 'Skipping code coverage'
+            }
+          }
+        }
+      }
     }
     post {
       success {
