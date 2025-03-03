@@ -3,7 +3,15 @@ pipeline {
       label 'docker-agent'
     }
     stages {
-        stage('Build') {
+      stage('Checkout code and prepare environment') {
+        steps {
+          git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
+          sh """
+          cd Chapter08/sample1
+          chmod +x gradlew
+          """
+      }
+      stage('Build Branches') {
             steps {
                 script {
                     if (env.BRANCH_NAME == 'main') {
@@ -24,6 +32,13 @@ pipeline {
                 script {
                     if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME.contains('feature') || env.BRANCH_NAME.contains('test')) {
                         echo 'Running tests'
+                        sh """
+                          cd Chapter08/sample1
+                          ./gradlew test
+                          ./gradlew jacocoTestReport
+                          ./gradlew jacocoTestCoverageVerification
+                         """
+                      }
                     } else {
                         error('Branch not allowed to run this pipeline')
                     }
@@ -35,12 +50,30 @@ pipeline {
                 script {
                     if (env.BRANCH_NAME == 'main') {
                         echo 'Running code coverage on main branch'
+                        sh """
+                          cd Chapter08/sample1
+                          ./gradlew checkstyleTest
+//                        ./gradlew CodeCoverage
+//                        ./gradlew checkstyle
+                         """
+                      }
                     } else {
                         echo 'Skipping code coverage'
                     }
                 }
             }
+        stage ('Print Reports') {    
+          steps {
+            publishHTML (
+              target: [
+                reportDir: 'Chapter08/sample1/build/reports/tests/test',
+                reportFiles: 'index.html',
+                reportName: "JaCoCo and JaCoCo checkstyle Report"
+              ]
+            )     
+          }
         }
+      }
     }
     post {
       success {
