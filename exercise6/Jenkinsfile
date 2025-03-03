@@ -32,14 +32,12 @@ pipeline {
           script {
             if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME.contains('feature') || env.BRANCH_NAME.contains('test')) {
                echo 'Running tests'
-                 steps {
-                   sh """
-                     cd Chapter08/sample1
-                     ./gradlew test
-                     ./gradlew jacocoTestReport
-                     ./gradlew jacocoTestCoverageVerification
-                   """    
-                 }
+               sh """
+                 cd Chapter08/sample1
+                 ./gradlew test
+                 ./gradlew jacocoTestReport
+                 ./gradlew jacocoTestCoverageVerification
+               """
             } else {
                 error('Branch not allowed to run this pipeline')
             }
@@ -51,12 +49,11 @@ pipeline {
           script {
             if (env.BRANCH_NAME == 'main') {
               echo 'Running CodeCoverage on main branch'
-              steps {
                 sh """
                   cd Chapter08/sample1
-                 ./gradlew checkstyleTest
-//                 ./gradlew CodeCoverage
-//                 ./gradlew checkstyle
+                  ./gradlew checkstyleTest
+//                ./gradlew CodeCoverage
+//                ./gradlew checkstyle
                 """
                 publishHTML (
                   target: [
@@ -65,7 +62,6 @@ pipeline {
                     reportName: "JaCoCo and JaCoCo checkstyle Report"
                   ]
                 )
-              }
             } else {
                 echo 'Skipping code coverage'
             }
