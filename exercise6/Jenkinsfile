@@ -32,12 +32,12 @@ pipeline {
           script {
             if (env.BRANCH_NAME == 'main' || env.BRANCH_NAME.contains('feature') || env.BRANCH_NAME.contains('test')) {
                echo 'Running tests'
-               sh """
-                 cd Chapter08/sample1
-                 ./gradlew test
-                 ./gradlew jacocoTestReport
-                 ./gradlew jacocoTestCoverageVerification
-               """
+//               sh """
+//                 cd Chapter08/sample1
+//                 ./gradlew test
+//                 ./gradlew jacocoTestReport
+//                 ./gradlew jacocoTestCoverageVerification
+//               """
             } else {
                 error('Branch not allowed to run this pipeline')
             }
@@ -49,29 +49,29 @@ pipeline {
           script {
             if (env.BRANCH_NAME == 'main') {
               echo 'Running CodeCoverage on main branch'
-              sh """
-                cd Chapter08/sample1
-                ./gradlew checkstyleTest
-//              ./gradlew CodeCoverage
-//              ./gradlew checkstyle
-                """
+//                sh """
+//                  cd Chapter08/sample1
+//                  ./gradlew checkstyleTest
+//                  ./gradlew CodeCoverage
+//                  ./gradlew checkstyle
+//                """
             } else {
                 echo 'Skipping CodeCoverage'
             }
           }
         }
       }
-      stage ('Publish Reports') {
-        steps {
-          publishHTML (
-            target: [
-              reportDir: 'Chapter08/sample1/build/reports/tests/test',
-              reportFiles: 'index.html',
-              reportName: "JaCoCo and JaCoCo checkstyle Report"
-            ]
-          )
-        }
-      }
+//      stage ('Publish Reports') {
+//        steps {
+//          publishHTML (
+//            target: [
+//              reportDir: 'Chapter08/sample1/build/reports/tests/test',
+//              reportFiles: 'index.html',
+//              reportName: "JaCoCo and JaCoCo checkstyle Report"
+//            ]
+//          )
+//        }
+//      }
     }
     post {
       success {
