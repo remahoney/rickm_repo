@@ -55,17 +55,20 @@ pipeline {
 //                ./gradlew CodeCoverage
 //                ./gradlew checkstyle
                 """
-                publishHTML (
-                  target: [
-                    reportDir: 'Chapter08/sample1/build/reports/tests/test',
-                    reportFiles: 'index.html',
-                    reportName: "JaCoCo and JaCoCo checkstyle Report"
-                  ]
-                )
             } else {
-                echo 'Skipping code coverage'
+                echo 'Skipping CodeCoverage'
             }
           }
+        }
+      stage (Publish Reports) {
+        steps {
+          publishHTML (
+            target: [
+              reportDir: 'Chapter08/sample1/build/reports/tests/test',
+              reportFiles: 'index.html',
+              reportName: "JaCoCo and JaCoCo checkstyle Report"
+            ]
+          )
         }
       }
     }
