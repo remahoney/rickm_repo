@@ -1,0 +1,51 @@
+pipeline {
+  agent {
+    label 'docker-agent'
+  }
+  stages {
+    stage('Checkout code and prepare environment') {
+      steps {
+        git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
+        sh """
+          cd Chapter08/sample1
+          chmod +x gradlew
+        """
+      }
+    }
+    stage('CodeCoverage Test') {
+      when {
+        branch 'main'
+      }
+      steps {
+        script {
+          try {
+            cd Chapter08/sample1
+            sh ./gradlew CodeCoverage
+            echo 'tests pass!'
+          }
+          catch (Exception e) {
+            echo 'tests fail!'
+          }
+        }
+      }
+    }
+    stage('Publish JaCoCo Report') {
+      steps {
+        publishHTML (
+          target [
+            reportDir: 'Chapter08/sample1/build/reports/tests/test
+            reportFiles: 'index.html'
+            reportName: "JaCoCo Report'
+          ]
+        )
+      }
+    }
+  post {
+    success {
+      echo 'pipeline ran successfully'
+      {
+    failure {
+      echo 'pipeline had failure'
+      }
+  }
+}
