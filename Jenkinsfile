@@ -1,5 +1,7 @@
 pipeline {
-  agent any
+  agent {
+    label 'docker-agent'
+    }
   stages {
     stage('Checkout code and prepare environment') {
       steps {
@@ -17,7 +19,7 @@ pipeline {
           ./gradlew test
           ./gradlew jacocoTestReport
           ./gradlew jacocoTestCoverageVerification
-        """
+        """    
       }
     }
     stage("Run checkstyleTest, codecoverage, and checkstyle tests") {
@@ -25,9 +27,16 @@ pipeline {
         sh """
           cd Chapter08/sample1
           ./gradlew checkstyleTest
-          #./gradlew CodeCoverage
-          #./gradlew checkstyle
+#          ./gradlew CodeCoverage
+#          ./gradlew checkstyle
         """
+        publishHTML (
+          target: [
+            reportDir: 'Chapter08/sample1/build/reports/tests/test',
+            reportFiles: 'index.html',
+            reportName: "JaCoCo and JaCoCo checkstyle Report"
+          ]
+        )
       }
     }
     stage("Perform Conditional Tests if a Failure") {
@@ -47,28 +56,12 @@ pipeline {
       }
     }
   }
-<<<<<<< HEAD
-}
-post {
-  success {
-    echo 'pipeline ran perfectly'
+  post {
+    success {
+      echo 'pipeline ran perfectly'
+      } 
+      failure {
+        echo 'pipeline failure'
+      } 
   }
-  failure {
-    echo 'pipeline failure'
-  }
-  publishHTML (
-    target [
-      reportDir: 'Chapter08/sample1/build/reports/tests/test',
-      reportFiles: 'index.html'
-      reportName: "JaCoCo Report'
-    ]
-  publishHTML (
-    target: [
-      reportDir: 'Chapter08/sample1/build/reports/tests/test',
-      reportFiles: 'index.html',
-      reportName: "jacoco checkstyle"
-    ]
-  )
-=======
->>>>>>> 528187db491972c6df341cf9773ceae8b837e19b
 }
