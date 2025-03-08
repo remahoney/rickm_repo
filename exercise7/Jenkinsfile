@@ -29,17 +29,36 @@ pipeline {
         }
       }
     }
-    stage('Publish JaCoCo Report') {
+    stage('Test') {
+      when {
+        not {
+          branch 'main'
+        }
+      }
       steps {
-        publishHTML(
-          target [
-            reportDir: 'Chapter08/sample1/build/reports/tests/test',
-            reportFiles: 'index.html',
-            reportName: 'JaCoCo Report'
-          ]
-        )
+        script {
+          try {
+            cd Chapter08/sample1
+            sh ./gradlew test
+            echo 'tests pass!'
+          }
+          catch (Exception e) {
+            echo 'tests fail!'
+          }
+        }
       }
     }
+//    stage('Publish JaCoCo Report') {
+//      steps {
+//        publishHTML(
+//          target [
+//            reportDir: 'Chapter08/sample1/build/reports/tests/test',
+//            reportFiles: 'index.html',
+//            reportName: 'JaCoCo Report'
+//          ]
+//        )
+//      }
+//    }
   post {
     success {
       echo 'pipeline ran successfully'
