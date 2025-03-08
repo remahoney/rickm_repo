@@ -62,7 +62,7 @@ pipeline {
   post {
     success {
       echo 'pipeline ran successfully'
-      {
+      }
     failure {
       echo 'pipeline had failure'
       }
