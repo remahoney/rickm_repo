@@ -44,7 +44,7 @@ pipeline {
             cd Chapter08/sample1
             sh """
               ./gradlew test
-              ./gradlew jacocoTestReport
+              ./gradlew jacocoTestCoverageVerification
             """
             echo 'tests pass!'
           }
