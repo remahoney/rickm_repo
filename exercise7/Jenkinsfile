@@ -1,51 +1,64 @@
 pipeline {
-  agent {
-    label 'docker-agent'
-  }
+  agent any
   stages {
-    stage('Checkout code and prepare environment') {
+    stage('Checkout') {
       steps {
-        git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
-        sh """
-          cd Chapter08/sample1
-          chmod +x gradlew
-        """
+        checkout scm
       }
     }
-    stage('CodeCoverage Test') {
+    stage('Tests') {
       when {
-        branch 'main'
+        not {
+          branch 'main'
+        }
       }
       steps {
-        script {
-          try {
-            cd Chapter08/sample1
-            sh ./gradlew CodeCoverage
-            echo 'tests pass!'
-          }
-          catch (Exception e) {
-            echo 'tests fail!'
+        parallel {
+          stage('Unit Tests') {
+            steps {
+              echo 'Running unit tests...'
+              // Insert your unit test commands here
+              }
+            }
+          stage('Integration Tests') {
+            steps {
+              echo 'Running integration tests...'
+              // Insert your integration test commands here
+              }
+            }
+          stage('Static Analysis') {
+            steps {
+              echo 'Running static analysis...'
+              // Insert your static analysis commands here
+              }
+            }
           }
         }
       }
     }
-    stage('Publish JaCoCo Report') {
+    stage('Code Coverage') {
+      when {
+        branch 'main'
+      }
       steps {
-        publishHTML(
-          target [
-            reportDir: 'Chapter08/sample1/build/reports/tests/test',
-            reportFiles: 'index.html',
-            reportName: 'JaCoCo Report'
-          ]
-        )
+        echo 'Running code coverage tests...'
+        // Insert your code coverage test commands here
       }
     }
+  }
   post {
-    success {
-      echo 'pipeline ran successfully'
-      {
-    failure {
-      echo 'pipeline had failure'
+    always {
+      jacoco(execPattern: '**/jacoco.exec')
+        script {
+          def testsFailed = currentBuild.result == 'FAILURE'
+            if (testsFailed) {
+              echo 'tests fail!'
+            } else {
+                echo 'tests pass!'
+            }
+          }
+        }
       }
+    }
   }
 }
