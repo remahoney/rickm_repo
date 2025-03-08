@@ -12,7 +12,7 @@ pipeline {
         """
       }
     }
-    stage('codestyleTest Test') {
+    stage('checkstyleTest Test') {
       when {
         branch 'main'
       }
@@ -20,8 +20,10 @@ pipeline {
         script {
           try {
             cd Chapter08/sample1
-            sh ./gradlew checkstyleTest
-//            sh ./gradlew CodeCoverage
+            sh """
+              ./gradlew checkstyleTest
+//            ./gradlew CodeCoverage
+            """
             echo 'tests pass!'
           }
           catch (Exception e) {
@@ -40,8 +42,10 @@ pipeline {
         script {
           try {
             cd Chapter08/sample1
-            sh ./gradlew test
-            sh ./gradlew jacocoTestReport
+            sh """
+              ./gradlew test
+              ./gradlew jacocoTestReport
+            """
             echo 'tests pass!'
           }
           catch (Exception e) {
