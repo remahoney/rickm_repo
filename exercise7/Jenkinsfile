@@ -12,7 +12,7 @@ pipeline {
         """
       }
     }
-    stage('CodeCoverage Test') {
+    stage('codestyleTest Test') {
       when {
         branch 'main'
       }
@@ -20,7 +20,8 @@ pipeline {
         script {
           try {
             cd Chapter08/sample1
-            sh ./gradlew CodeCoverage
+            sh ./gradlew checkstyleTest
+//            sh ./gradlew CodeCoverage
             echo 'tests pass!'
           }
           catch (Exception e) {
@@ -40,6 +41,7 @@ pipeline {
           try {
             cd Chapter08/sample1
             sh ./gradlew test
+            sh ./gradlew jacocoTestReport
             echo 'tests pass!'
           }
           catch (Exception e) {
@@ -62,7 +64,7 @@ pipeline {
   post {
     success {
       echo 'pipeline ran successfully'
-      {
+      }
     failure {
       echo 'pipeline had failure'
       }
