@@ -1,64 +1,51 @@
 pipeline {
-  agent any
+  agent {
+    label 'docker-agent'
+  }
   stages {
-    stage('Checkout') {
+    stage('Checkout code and prepare environment') {
       steps {
-        checkout scm
+        git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
+        sh """
+          cd Chapter08/sample1
+          chmod +x gradlew
+        """
       }
     }
-    stage('Tests') {
-      when {
-        not {
-          branch 'main'
-        }
-      }
-      steps {
-        parallel {
-          stage('Unit Tests') {
-            steps {
-              echo 'Running unit tests...'
-              // Insert your unit test commands here
-              }
-            }
-          stage('Integration Tests') {
-            steps {
-              echo 'Running integration tests...'
-              // Insert your integration test commands here
-              }
-            }
-          stage('Static Analysis') {
-            steps {
-              echo 'Running static analysis...'
-              // Insert your static analysis commands here
-              }
-            }
-          }
-        }
-      }
-    }
-    stage('Code Coverage') {
+    stage('CodeCoverage Test') {
       when {
         branch 'main'
       }
       steps {
-        echo 'Running code coverage tests...'
-        // Insert your code coverage test commands here
-      }
-    }
-  }
-  post {
-    always {
-      jacoco(execPattern: '**/jacoco.exec')
         script {
-          def testsFailed = currentBuild.result == 'FAILURE'
-            if (testsFailed) {
-              echo 'tests fail!'
-            } else {
-                echo 'tests pass!'
-            }
+          try {
+            cd Chapter08/sample1
+            sh ./gradlew CodeCoverage
+            echo 'tests pass!'
+          }
+          catch (Exception e) {
+            echo 'tests fail!'
           }
         }
       }
     }
+    stage('Publish JaCoCo Report') {
+      steps {
+        publishHTML(
+          target [
+            reportDir: 'Chapter08/sample1/build/reports/tests/test',
+            reportFiles: 'index.html',
+            reportName: 'JaCoCo Report'
+          ]
+        )
+      }
+    }
+  post {
+    success {
+      echo 'pipeline ran successfully'
+      {
+    failure {
+      echo 'pipeline had failure'
+      }
   }
 }
