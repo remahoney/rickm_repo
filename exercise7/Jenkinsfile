@@ -12,7 +12,7 @@ pipeline {
         """
       }
     }
-    stage('checkstyleTest Test') {
+    stage('checkstyleTest - CodeCoverage Test did not work') {
       when {
         branch 'main'
       }
@@ -54,24 +54,24 @@ pipeline {
         }
       }
     }
-//    stage('Publish JaCoCo Report') {
-//      steps {
-//        publishHTML(
-//          target [
-//            reportDir: 'Chapter08/sample1/build/reports/tests/test',
-//            reportFiles: 'index.html',
-//            reportName: 'JaCoCo Report'
-//          ]
-//        )
-//      }
-//    }
-  }
-    post {
-      success {
-        echo 'pipeline ran successfully'
-        }
-      failure {
-        echo 'pipeline had failure'
-        }
+    stage('Publish JaCoCo Report') {
+      steps {
+        publishHTML(
+          target [
+            reportDir: 'Chapter08/sample1/build/reports/tests/test',
+            reportFiles: 'index.html',
+            reportName: 'JaCoCo Report'
+          ]
+        )
+      }
     }
+  }
+  post {
+    success {
+      echo 'pipeline ran successfully'
+      }
+    failure {
+      echo 'pipeline had failure'
+      }
+  }
 }
