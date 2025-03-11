@@ -51,25 +51,27 @@ pipeline {
           catch (Exception e) {
             echo 'tests fail!'
           }
-      } 
-    }
-    stage('Publish JaCoCo Report') {
-      steps {
-        publishHTML(target: [
-          reportDir: 'Chapter08/sample1/build/reports/tests/test',
-          reportFiles: 'index.html',
-          reportName: "JaCoCo Report"
-        ])
+        }
       }
     }
+//    stage('Publish JaCoCo Report') {
+//      steps {
+//        publishHTML(
+//          target [
+//           reportDir: 'Chapter08/sample1/build/reports/tests/test',
+//            reportFiles: 'index.html',
+//            reportName: "JaCoCo Report"
+//          ]
+//        )
+//      }
+//    }
   }
-}
-post {
-  success {
-    echo 'pipeline ran successfully'
-    }
-  failure {
-    echo 'pipeline had failure'
-    }
+  post {
+    success {
+      echo 'pipeline ran successfully'
+      }
+    failure {
+      echo 'pipeline had failure'
+      }
   }
 }
