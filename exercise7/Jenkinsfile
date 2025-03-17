@@ -19,8 +19,8 @@ pipeline {
       steps {
         script {
           try {
-            cd Chapter08/sample1
             sh """
+              cd Chapter08/sample1
               ./gradlew checkstyleTest
 //            ./gradlew CodeCoverage
             """
@@ -41,8 +41,8 @@ pipeline {
       steps {
         script {
           try {
-            cd Chapter08/sample1
             sh """
+              cd Chapter08/sample1
               ./gradlew test
               ./gradlew jacocoTestReport
             """
@@ -51,14 +51,13 @@ pipeline {
           catch (Exception e) {
             echo 'tests fail!'
           }
-        }
-      }
+      } 
     }
     stage('Publish JaCoCo Report') {
       steps {
         publishHTML(
           target: [
-           reportDir: 'Chapter08/sample1/build/reports/tests/test',
+            reportDir: 'Chapter08/sample1/build/reports/jacoco/test/html',
             reportFiles: 'index.html',
             reportName: "JaCoCo Report"
           ]
@@ -66,12 +65,13 @@ pipeline {
       }
     }
   }
-  post {
-    success {
-      echo 'pipeline ran successfully'
-      }
-    failure {
-      echo 'pipeline had failure'
-      }
+}
+post {
+  success {
+    echo 'pipeline ran successfully'
+    }
+  failure {
+    echo 'pipeline had failure'
+    }
   }
 }
