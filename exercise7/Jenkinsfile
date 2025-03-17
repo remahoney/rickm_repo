@@ -51,6 +51,7 @@ pipeline {
           catch (Exception e) {
             echo 'tests fail!'
           }
+        }
       } 
     }
     stage('Publish JaCoCo Report') {
