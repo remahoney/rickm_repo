@@ -12,6 +12,15 @@ pipeline {
         """
       }
     }
+    stage('Initalize gradlew')
+      steps (
+        sh """
+          set -e
+          cd Chapter08/sample1
+          ./gradlew build
+        """
+      }
+    }
     stage('checkstyleTest - CodeCoverage Test did not work') {
       when {
         branch 'main'
