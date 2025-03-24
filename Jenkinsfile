@@ -21,7 +21,7 @@ pipeline {
           sh """
             cd $PROJECT_DIR
             chmod +x gradlew
-            cp $(find build -name \*jar) .
+            cp $(find build -name \\*jar) .
           """
       }
     }
