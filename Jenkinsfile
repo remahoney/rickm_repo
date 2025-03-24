@@ -40,7 +40,7 @@ pipeline {
           if (env.BRANCH_NAME == 'main') {
             sh '.gradlew checkstyleTest'
         } else if (env.BRANCH_NAME == 'feature' || env.BRANCH_NAME == 'playground') {
-            sh './gradlew checkstyleTest'
+            sh './gradlew checkstyleTest'}
         }
       }
     }
