@@ -22,6 +22,7 @@ pipeline {
             cd $PROJECT_DIR
             chmod +x gradlew
             cp $find build -name \\*jar .
+          """
       }
     }
     stage('Initialize Gradlew Build') {
@@ -39,7 +40,7 @@ pipeline {
           if (env.BRANCH_NAME == 'main') {
             sh '.gradlew checkstyleTest'
         } else if (env.BRANCH_NAME == 'feature' || env.BRANCH_NAME == 'playground') {
-            sh './gradlew checkstyleTest'}
+            sh './gradlew checkstyleTest' }
         }
       }
     }
