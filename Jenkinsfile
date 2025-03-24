@@ -1,74 +1,75 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'dlambrig/gradle-agent:latest'
+      args '-v /var/run/docker.sock:/var/run/docker.sock'
+      alwaysPull true
+      customWorkspace '/home/jenkins/.gradle/workspace'
+    }
+  {
+  environment {
+    REGISTRY = "https://localhost:5001" 
+    REGISTRY_HOST = "localhost:5001"
+    PROJECT_DIR = "Chapter08/sample1"
+    IMAGE_NAME = "calculator"
+    IMAGE_TAG = "${BUILD_NUMBER}"
+  }
   stages {
     stage('Checkout code and prepare environment') {
       steps {
         git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
-        sh """
-          cd Chapter08/sample1
-          chmod +x gradlew
-        """
+          sh """
+            cd $PROJECT_DIR
+            chmod +x gradlew
+            cp $find build -name \*jar .
+          """
       }
     }
-    stage("Run initial test and jacoco tests") {
+    stage('Initialize Gradlew Build') {
       steps {
         sh """
-          cd Chapter08/sample1
-          ./gradlew test
-          ./gradlew jacocoTestReport
-          ./gradlew jacocoTestCoverageVerification
+          set -e
+          cd $PROJECT_DIR
+          ./gradlew build
         """
       }
     }
-    stage("Run checkstyleTest, codecoverage, and checkstyle tests") {
+    stage('Run checkstyleTest') {
       steps {
-        sh """
-          cd Chapter08/sample1
-          ./gradlew checkstyleTest
-          #./gradlew CodeCoverage
-          #./gradlew checkstyle
-        """
+        script {
+          if (env.BRANCH_NAME == 'main') {
+            sh '.gradlew checkstyleTest'
+        } else if (env.BRANCH_NAME == 'feature' || env.BRANCH_NAME == 'playground') {
+            sh './gradlew checkstyleTest'
+        }
       }
     }
-    stage("Perform Conditional Tests if a Failure") {
+    stage('Login to Registry and Build Container') {
       when {
-        expression { currentBuild.result == 'FAILURE' }
+        expression { 
+          env.BRANCH_NAME != 'playground' && currentBuild.result == 'SUCCESS'
+        }
       }
       steps {
-        echo 'currentBuild failed'
+        script {
+          withCredentials([usernamePassword(credentialsId: 'docker-registry', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+        sh """
+          set -e
+          cd $PROJECT_DIR
+          echo "\$DOCKER_PASS" | docker login \$REGISTRY -u \$DOCKER_USER --password-stdin            
+          def IMAGE_NAME = env.BRANCH_NAME == 'main' ? 'calculator' : 'calculator-feature'
+          def IMAGE_TAG = env.BRANCH_NAME == 'main' ? '1.0' : '0.1'
+          docker build -t repository/${IMAGE_NAME}:${IMAGE_TAG} .
+          docker tag ${IMAGE_NAME} ${REGISTRY_HOST}/${IMAGE_NAME}:${IMAGE_TAG}
+          docker push repository/${IMAGE_NAME}:${IMAGE_TAG}
+        """
+        }
       }
     }
-    stage("Perform Conditional Tests if a Success") {
-      when {
-        expression { currentBuild.result == 'SUCCESS' }
-      }
-      steps {
-        echo 'currentBuild succeeded'
-      }
+  }
+  post {
+    always {
+      echo 'Pipeline Execution Complete'
     }
   }
-<<<<<<< HEAD
-}
-post {
-  success {
-    echo 'pipeline ran perfectly'
-  }
-  failure {
-    echo 'pipeline failure'
-  }
-  publishHTML (
-    target [
-      reportDir: 'Chapter08/sample1/build/reports/tests/test',
-      reportFiles: 'index.html'
-      reportName: "JaCoCo Report'
-    ]
-  publishHTML (
-    target: [
-      reportDir: 'Chapter08/sample1/build/reports/tests/test',
-      reportFiles: 'index.html',
-      reportName: "jacoco checkstyle"
-    ]
-  )
-=======
->>>>>>> 528187db491972c6df341cf9773ceae8b837e19b
 }
