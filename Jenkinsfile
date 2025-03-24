@@ -62,7 +62,7 @@ pipeline {
           docker build -t repository/${IMAGE_NAME}:${IMAGE_TAG} .
           docker tag ${IMAGE_NAME} ${REGISTRY_HOST}/${IMAGE_NAME}:${IMAGE_TAG}
           docker push repository/${IMAGE_NAME}:${IMAGE_TAG}
-        """
+        """}
         }
       }
     }
