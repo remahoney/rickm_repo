@@ -22,7 +22,6 @@ pipeline {
             cd $PROJECT_DIR
             chmod +x gradlew
             cp $find build -name \\*jar .
-          """
       }
     }
     stage('Initialize Gradlew Build') {
