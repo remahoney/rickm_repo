@@ -6,7 +6,7 @@ pipeline {
       alwaysPull true
       customWorkspace '/home/jenkins/.gradle/workspace'
     }
-  {
+  }
   environment {
     REGISTRY = "https://localhost:5001" 
     REGISTRY_HOST = "localhost:5001"
@@ -21,7 +21,7 @@ pipeline {
           sh """
             cd $PROJECT_DIR
             chmod +x gradlew
-            cp $(find build -name \\*jar) .
+            cp $find build -name \*jar .
           """
       }
     }
@@ -40,7 +40,7 @@ pipeline {
           if (env.BRANCH_NAME == 'main') {
             sh '.gradlew checkstyleTest'
         } else if (env.BRANCH_NAME == 'feature' || env.BRANCH_NAME == 'playground') {
-            sh './gradlew checkstyleTest'
+            sh './gradlew checkstyleTest'}
         }
       }
     }
@@ -62,7 +62,7 @@ pipeline {
           docker build -t repository/${IMAGE_NAME}:${IMAGE_TAG} .
           docker tag ${IMAGE_NAME} ${REGISTRY_HOST}/${IMAGE_NAME}:${IMAGE_TAG}
           docker push repository/${IMAGE_NAME}:${IMAGE_TAG}
-        """
+        """}
         }
       }
     }
