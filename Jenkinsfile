@@ -2,6 +2,7 @@ pipeline {
   agent {
     docker {
       image 'dlambrig/gradle-agent:latest'
+      label 'docker-agent'
       args '-v /var/run/docker.sock:/var/run/docker.sock'
       alwaysPull true
       customWorkspace '/home/jenkins/.gradle/workspace'
@@ -23,7 +24,6 @@ pipeline {
             chmod +x gradlew
             cp \$(find build -name \\*jar) .
           """
-        }
       }
     }
     stage('Build') {
@@ -71,7 +71,7 @@ pipeline {
           withCredentials([usernamePassword(credentialsId: 'docker-registry', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
         sh """
           set -e
-          cd ${PROJECT_DIR}
+          cd $PROJECT_DIR
           echo "\$DOCKER_PASS" | docker login \$REGISTRY -u \$DOCKER_USER --password-stdin
           docker build -t ${IMAGE_NAME} .
           docker tag ${IMAGE_NAME} ${REGISTRY_HOST}/${IMAGE_NAME}:${IMAGE_TAG}
