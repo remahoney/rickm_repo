@@ -1,8 +1,8 @@
 pipeline {
   agent {
+    label 'docker-agent'
     docker {
       image 'dlambrig/gradle-agent:latest'
-      label 'docker-agent'
       args '-v /var/run/docker.sock:/var/run/docker.sock'
       alwaysPull true
       customWorkspace '/home/jenkins/.gradle/workspace'
