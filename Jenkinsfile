@@ -4,9 +4,9 @@ pipeline {
       image 'dlambrig/gradle-agent-intel:week11'
     }
   }
-#  triggers {
-#    pollSCM('* * * * *')
-#  }
+// triggers {
+//   pollSCM('* * * * *')
+// }
   stages {
     stage("Gather GitHub Repository") {
       steps {
