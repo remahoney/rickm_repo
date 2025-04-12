@@ -1,107 +1,75 @@
 pipeline {
   agent {
-    docker {
-      image 'dlambrig/gradle-agent:latest'
-      args '-v /var/run/docker.sock:/var/run/docker.sock'
-      alwaysPull true
-      customWorkspace '/home/jenkins/.gradle/workspace'
+    docker (
+      image 'dlambrig/gradle-agent-intel:week11'
     }
   }
-  environment {
-    REGISTRY = "https://localhost:5001" // Replace with actual registry address
-    REGISTRY_HOST = "localhost:5001" // Replace with actual registry address
-    PROJECT_DIR = "Chapter08/sample1"
-    IMAGE_NAME = "calculator"
-    IMAGE_TAG = "${BUILD_NUMBER}" // Example tag
-  }
+#  triggers {
+#    pollSCM('* * * * *')
+#  }
   stages {
-    stage('Checkout code and prepare environment') {
+    stage("Gather GitHub Repository") {
       steps {
         git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
-          sh """
-            cd $PROJECT_DIR
-            chmod +x gradlew
-            cp \$(find build -name \\*jar) .
-          """
+        cd Chapter08/sample1
       }
     }
-    stage('Build') {
+    stage("Compile") { 
+      steps { sh "./gradlew compileJava" }
+    }
+    stage("Unit test") {
+      steps { sh "./gradlew test" }
+    }
+    stage("Code coverage") { 
       steps {
-        sh """
-          set -e
-          cd $PROJECT_DIR
-          ./gradlew build
-        """
+        sh "./gradlew jacocoTestReport"
+        sh "./gradlew jacocoTestCoverageVerification"
       }
     }
-    stage('Set Variables') {
+    stage("Static code analysis") { 
       steps {
-        script {
-          if (env.BRANCH_NAME == 'main') {
-            IMAGE_NAME = 'calculator'
-            IMAGE_TAG = '1.0'
-            checkstyleTest = true
-          } else if (env.BRANCH_NAME.startsWith('feature/')) {
-              IMAGE_NAME = 'calculator-feature'
-              IMAGE_TAG = '0.1'
-              checkstyleTest = false
-          } else if (env.BRANCH_NAME == 'playground') {
-              IMAGE_NAME = null
-              checkstyleTest = false
-          } else {
-              error "Unsupported branch: ${env.BRANCH_NAME}"
-          }
-        }
+        sh "./gradlew checkstyleMain"
       }
     }
-    stage('Run Tests') {
+    stage("Build") { 
+      steps { sh "./gradlew build" }
+    }
+    stage("Docker build") { 
       steps {
-        script {
-          sh 'cd ${PROJECT_DIR}'    
-          if (checkstyleTest && env.BRANCH_NAME == 'main') {
-            sh 'gradlew checkstyleTest'
-          }
-        }
+        sh "docker build -t remahoney/calculator:${BUILD_TIMESTAMP} ."
       }
     }
-    stage('Login to Registry and Build Image') {
+    stage("Docker push") { 
       steps {
-        script {
-          withCredentials([usernamePassword(credentialsId: 'docker-registry', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-        sh """
-          set -e
-          cd $PROJECT_DIR
-          echo "\$DOCKER_PASS" | docker login \$REGISTRY -u \$DOCKER_USER --password-stdin
-          docker build -t ${IMAGE_NAME} .
-          docker tag ${IMAGE_NAME} ${REGISTRY_HOST}/${IMAGE_NAME}:${IMAGE_TAG}
-          docker push ${REGISTRY_HOST}/${IMAGE_NAME}:${IMAGE_TAG}
-        """}
-        }
+        sh "docker push remahoney/calculator:${BUILD_TIMESTAMP}"
       }
     }
-    stage('Build Container') {
-      when {
-        expression {
-          return IMAGE_NAME != null // Skip container creation for 'playground' branch
-        }
-      }
+    stage("Update version") { 
       steps {
-        script {
-          sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-        }
+        sh "sed -i 's/{{VERSION}}/${BUILD_TIMESTAMP}/g' deployment.yaml"
       }
     }
-    stage('Push to Local Repository') {
-      when {
-        expression {
-          return IMAGE_NAME != null // Skip pushing for 'playground' branch
-        }
-      }
+    stage("Deploy to Staging") { 
       steps {
-        script {
-          sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} localhost:5001/${IMAGE_NAME}:${IMAGE_TAG}"
-          sh "docker push localhost:5001/${IMAGE_NAME}:${IMAGE_TAG}"
-        }
+        sh "kubectl config use-context docker-desktop"
+        sh "kubectl --insecure-skip-tls-verify apply -f hazelcast.yaml"
+        sh "kubectl --insecure-skip-tls-verify apply -f deployment.yaml"
+        sh "kubectl --insecure-skip-tls-verify apply -f service.yaml"
+      }
+    }
+    stage("Acceptance test") { 
+      steps {
+        sleep 60
+        sh "chmod +x acceptance-test.sh && ./acceptance-test.sh"
+      }
+    }  
+  # Performance test stages
+    stage("Release") { 
+      steps {
+        sh "kubectl config use-context gke_remahoney-msit5330_us-east1_hello-cluster"
+        sh "kubectl --insecure-skip-tls-verify apply -f hazelcast.yaml"
+        sh "kubectl --insecure-skip-tls-verify apply -f deployment.yaml"
+        sh "kubectl --insecure-skip-tls-verify apply -f service.yaml"
       }
     }
   }
