@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker (
-      image 'dlambrig/gradle-agent-intel:week11'
+      image dlambrig/gradle-agent-intel:week11
     }
   }
 #  triggers {
