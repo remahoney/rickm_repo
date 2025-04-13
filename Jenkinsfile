@@ -9,7 +9,7 @@ pipeline {
     stage("Gather GitHub Repository") {
       steps {
         git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
-        cd Chapter08/sample1
+        sh "cd Chapter08/sample1"
       }
     }
     stage("Compile") { 
