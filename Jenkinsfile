@@ -2,9 +2,9 @@ pipeline {
   agent {
     label 'docker-agent'
   }
-// triggers {
-//   pollSCM('* * * * *')
-// }
+//  triggers {
+//   pollSCM('H * * * *')
+//  }
   stages {
     stage("Gather GitHub Repository") {
       steps {
@@ -13,24 +13,35 @@ pipeline {
       }
     }
     stage("Compile") { 
-      steps { sh "./gradlew compileJava" }
+      steps { 
+        sh "cd Chapter08/sample1"
+        sh "./gradlew compileJava"
+      }
     }
     stage("Unit test") {
-      steps { sh "./gradlew test" }
+      steps { 
+        sh "cd Chapter08/sample1"
+        sh "./gradlew test"
+      }
     }
     stage("Code coverage") { 
       steps {
+        sh "cd Chapter08/sample1"
         sh "./gradlew jacocoTestReport"
         sh "./gradlew jacocoTestCoverageVerification"
       }
     }
     stage("Static code analysis") { 
       steps {
+        sh "cd Chapter08/sample1"
         sh "./gradlew checkstyleMain"
       }
     }
     stage("Build") { 
-      steps { sh "./gradlew build" }
+      steps { 
+        sh "cd Chapter08/sample1"
+        sh "./gradlew build"
+      }
     }
     stage("Docker build") { 
       steps {
@@ -61,7 +72,7 @@ pipeline {
         sh "chmod +x acceptance-test.sh && ./acceptance-test.sh"
       }
     }  
- // Performance test stages
+  # Performance test stages
     stage("Release") { 
       steps {
         sh "kubectl config use-context gke_remahoney-msit5330_us-east1_hello-cluster"
