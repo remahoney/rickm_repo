@@ -72,7 +72,7 @@ pipeline {
         sh "chmod +x acceptance-test.sh && ./acceptance-test.sh"
       }
     }  
-  # Performance test stages
+// Performance test stages
     stage("Release") { 
       steps {
         sh "kubectl config use-context gke_remahoney-msit5330_us-east1_hello-cluster"
