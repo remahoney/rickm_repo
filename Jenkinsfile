@@ -10,7 +10,7 @@ pipeline {
       steps {
         git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
         sh "cd Chapter08/sample1"
-        sh "chmod +x ./gradlew"
+        sh "chmod +x gradlew"
       }
     }
     stage("Compile") { 
