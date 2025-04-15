@@ -2,13 +2,10 @@ pipeline {
   agent {
     label 'docker-agent'
   }
-//  triggers {
-//   pollSCM('H * * * *')
-//  }
   stages {
     stage("Gather GitHub Repository") {
       steps {
-        git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
+        git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition', branch: 'master'
         sh "cd Chapter08/sample1"
         sh "pwd"
         sh "ls -l"
