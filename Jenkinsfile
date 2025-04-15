@@ -5,8 +5,7 @@ pipeline {
   stages {
     stage("Gather GitHub Repository") {
       steps {
-        git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
-        sh "cd ./Chapter08/sample1"
+        git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition/tree/master/Chapter08/sample1'
         sh "pwd"
         sh "ls -l"
         sh "chmod +x gradlew"
