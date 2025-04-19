@@ -78,6 +78,7 @@ pipeline {
         kubectl --insecure-skip-tls-verify apply -f hazelcast.yaml
         kubectl --insecure-skip-tls-verify apply -f deployment.yaml
         kubectl --insecure-skip-tls-verify apply -f service.yaml
+        '''
       }
     }
     stage("Acceptance test") { 
