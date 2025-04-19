@@ -6,41 +6,53 @@ pipeline {
     stage("Gather GitHub Repository") {
       steps {
         git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
-        sh "cd Chapter08/sample1"
-        sh "pwd"
-        sh "ls -l"
-        sh "chmod +x gradlew"
+        sh ''' 
+        cd Chapter08/sample1
+        pw"
+        ls -l
+        chmod +x gradlew
+        '''
       }
     }
-    stage("Compile") { 
-      steps { 
-        sh "cd Chapter08/sample1"
-        sh "./gradlew compileJava"
+    stage("Compile") {
+      steps {
+        sh '''
+        cd Chapter08/sample1
+        ./gradlew compileJava
+        '''
       }
     }
     stage("Unit test") {
-      steps { 
-        sh "cd Chapter08/sample1"
-        sh "./gradlew test"
+      steps {
+        sh '''
+        cd Chapter08/sample1
+        ./gradlew test
+        '''
       }
     }
-    stage("Code coverage") { 
+    stage("Code coverage") {
       steps {
-        sh "cd Chapter08/sample1"
-        sh "./gradlew jacocoTestReport"
-        sh "./gradlew jacocoTestCoverageVerification"
+        sh '''
+        cd Chapter08/sample1
+        ./gradlew jacocoTestReport
+        ./gradlew jacocoTestCoverageVerification
+        '''
       }
     }
     stage("Static code analysis") { 
       steps {
-        sh "cd Chapter08/sample1"
-        sh "./gradlew checkstyleMain"
+        sh '''
+        cd Chapter08/sample1
+        ./gradlew checkstyleMain
+        '''
       }
     }
-    stage("Build") { 
-      steps { 
-        sh "cd Chapter08/sample1"
-        sh "./gradlew build"
+    stage("Build") {
+      steps {
+        sh '''
+        cd Chapter08/sample1
+        ./gradlew build
+        '''
       }
     }
     stage("Docker build") { 
@@ -58,12 +70,13 @@ pipeline {
         sh "sed -i 's/{{VERSION}}/${BUILD_TIMESTAMP}/g' deployment.yaml"
       }
     }
-    stage("Deploy to Staging") { 
+    stage("Deploy to Staging") {
       steps {
-        sh "kubectl config use-context docker-desktop"
-        sh "kubectl --insecure-skip-tls-verify apply -f hazelcast.yaml"
-        sh "kubectl --insecure-skip-tls-verify apply -f deployment.yaml"
-        sh "kubectl --insecure-skip-tls-verify apply -f service.yaml"
+        sh '''
+        kubectl config use-context docker-desktop
+        kubectl --insecure-skip-tls-verify apply -f hazelcast.yaml
+        kubectl --insecure-skip-tls-verify apply -f deployment.yaml
+        kubectl --insecure-skip-tls-verify apply -f service.yaml
       }
     }
     stage("Acceptance test") { 
@@ -71,14 +84,16 @@ pipeline {
         sleep 60
         sh "chmod +x acceptance-test.sh && ./acceptance-test.sh"
       }
-    }  
-// Performance test stages
-    stage("Release") { 
+    }
+## Performance test stages
+    stage("Release") {
       steps {
-        sh "kubectl config use-context gke_remahoney-msit5330_us-east1_hello-cluster"
-        sh "kubectl --insecure-skip-tls-verify apply -f hazelcast.yaml"
-        sh "kubectl --insecure-skip-tls-verify apply -f deployment.yaml"
-        sh "kubectl --insecure-skip-tls-verify apply -f service.yaml"
+        sh '''
+        kubectl config use-context gke_remahoney-msit5330_us-east1_hello-cluster
+        kubectl --insecure-skip-tls-verify apply -f hazelcast.yaml
+        kubectl --insecure-skip-tls-verify apply -f deployment.yaml
+        kubectl --insecure-skip-tls-verify apply -f service.yaml
+        '''
       }
     }
   }
