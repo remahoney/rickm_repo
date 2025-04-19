@@ -87,16 +87,16 @@ pipeline {
       }
     }
 ## Performance test stages
-    stage("Release") {
-      steps {
-        sh '''
-        cd Chapter08/sample1
-        kubectl config use-context gke_remahoney-msit5330_us-east1_hello-cluster
-        kubectl --insecure-skip-tls-verify apply -f hazelcast.yaml
-        kubectl --insecure-skip-tls-verify apply -f deployment.yaml
-        kubectl --insecure-skip-tls-verify apply -f service.yaml
-        '''
-      }
-    }
+    ## stage("Release") {
+      ## steps {
+        ## sh '''
+        ## cd Chapter08/sample1
+        ## kubectl config use-context gke_remahoney-msit5330_us-east1_hello-cluster
+        ## kubectl --insecure-skip-tls-verify apply -f hazelcast.yaml
+        ## kubectl --insecure-skip-tls-verify apply -f deployment.yaml
+        ##kubectl --insecure-skip-tls-verify apply -f service.yaml
+        ## '''
+     ## }
+   ## }
   }
 }
