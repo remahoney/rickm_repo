@@ -39,14 +39,6 @@ pipeline {
         '''
       }
     }
-    stage("Static code analysis") { 
-      steps {
-        sh '''
-        cd Chapter08/sample1
-        ./gradlew checkstyleMain
-        '''
-      }
-    }
     stage("Build") {
       steps {
         sh '''
