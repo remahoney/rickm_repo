@@ -8,7 +8,7 @@ pipeline {
         git url: 'https://github.com/remahoney/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
         sh ''' 
         cd Chapter08/sample1
-        pw"
+        pwd
         ls -l
         chmod +x gradlew
         '''
